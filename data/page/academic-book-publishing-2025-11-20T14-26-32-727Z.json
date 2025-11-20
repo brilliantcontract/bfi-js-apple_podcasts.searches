@@ -1999,123 +1999,6 @@
             }
           },
           {
-            "id": "1000624956937",
-            "type": "podcast-episodes",
-            "href": "/v1/catalog/us/podcast-episodes/1000624956937?l=en-US",
-            "attributes": {
-              "artistName": "New Books Network",
-              "artwork": {
-                "bgColor": "446b4c",
-                "hasP3": false,
-                "height": 3000,
-                "textColor1": "fdfbfc",
-                "textColor2": "ecf9ea",
-                "textColor3": "d8ded8",
-                "textColor4": "cbdcca",
-                "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
-                "width": 3000
-              },
-              "artworkOrigin": "podcast",
-              "assetUrl": "https://traffic.megaphone.fm/NSR1524700316.mp3?updated=1692386616",
-              "contentAdvisory": "",
-              "contentRating": "clean",
-              "copyright": "New Books Network",
-              "description": {
-                "short": "A Discussion with NIko Pfund of Oxford University Press",
-                "standard": "Niko Pfund joins the podcast to discuss the value of scientific content for building out Large Language Models and some of the challenges around tracking the quality and ownership of aggregated content from unknown sources. We also discuss potential avenues for collaboration between Generative AI companies and scholarly publishers.\n﻿Niko Pfund is Academic Publisher at Oxford University Press and President of Oxford’s US office.\nLearn more about your ad choices. Visit megaphone.fm/adchoices\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
-              },
-              "durationInMilliseconds": 2668000,
-              "episodeNumber": 132,
-              "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
-              "genreNames": [
-                "Books"
-              ],
-              "guid": "f51380c2-3df4-11ee-82e3-e7367b789c00",
-              "kind": "full",
-              "mediaKind": "audio",
-              "name": "Academic Publishers Grapple with Advances in AI",
-              "offers": [
-                {
-                  "kind": "get",
-                  "type": "STDQ"
-                }
-              ],
-              "releaseDateTime": "2023-08-19T08:00:00Z",
-              "subscribable": true,
-              "url": "https://podcasts.apple.com/us/podcast/academic-publishers-grapple-with-advances-in-ai/id1532604157?i=1000624956937"
-            },
-            "relationships": {
-              "channel": {
-                "href": "/v1/catalog/us/podcast-episodes/1000624956937/channel?l=en-US",
-                "data": []
-              },
-              "podcast": {
-                "href": "/v1/catalog/us/podcast-episodes/1000624956937/podcast?l=en-US",
-                "data": [
-                  {
-                    "id": "1532604157",
-                    "type": "podcasts",
-                    "href": "/v1/catalog/us/podcasts/1532604157?l=en-US",
-                    "attributes": {
-                      "artistName": "New Books Network",
-                      "artwork": {
-                        "bgColor": "446b4c",
-                        "hasP3": false,
-                        "height": 3000,
-                        "textColor1": "fdfbfc",
-                        "textColor2": "ecf9ea",
-                        "textColor3": "d8ded8",
-                        "textColor4": "cbdcca",
-                        "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
-                        "width": 3000
-                      },
-                      "completed": false,
-                      "contentRating": "clean",
-                      "copyright": "© New Books Network",
-                      "createdDate": "2020-09-19",
-                      "description": {
-                        "standard": "Interviews with digital humanists about their new work\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
-                      },
-                      "displayType": "free",
-                      "editorialArtwork": {},
-                      "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
-                      "genreNames": [
-                        "Books",
-                        "Podcasts",
-                        "Arts",
-                        "Science",
-                        "Social Sciences"
-                      ],
-                      "kind": "episodic",
-                      "languageTag": "en-US",
-                      "name": "New Work in Digital Humanities",
-                      "offers": [
-                        {
-                          "kind": "get",
-                          "type": "STDQ"
-                        }
-                      ],
-                      "releaseDateTime": "2025-09-09T08:00:00Z",
-                      "releaseFrequency": "Updated Biweekly",
-                      "seasonNumbers": [],
-                      "subscribable": true,
-                      "subscriptionUrl": "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/subscribePodcast?cc=us&id=1532604157",
-                      "trackCount": 186,
-                      "url": "https://podcasts.apple.com/us/podcast/new-work-in-digital-humanities/id1532604157",
-                      "websiteUrl": "https://newbooksnetwork.com"
-                    },
-                    "relationships": {
-                      "channel": {
-                        "href": "/v1/catalog/us/podcasts/1532604157/channel?l=en-US",
-                        "data": []
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
             "id": "1000708797883",
             "type": "podcast-episodes",
             "href": "/v1/catalog/us/podcast-episodes/1000708797883?l=en-US",
@@ -2230,6 +2113,123 @@
                     "relationships": {
                       "channel": {
                         "href": "/v1/catalog/us/podcasts/1561011279/channel?l=en-US",
+                        "data": []
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "1000624956937",
+            "type": "podcast-episodes",
+            "href": "/v1/catalog/us/podcast-episodes/1000624956937?l=en-US",
+            "attributes": {
+              "artistName": "New Books Network",
+              "artwork": {
+                "bgColor": "446b4c",
+                "hasP3": false,
+                "height": 3000,
+                "textColor1": "fdfbfc",
+                "textColor2": "ecf9ea",
+                "textColor3": "d8ded8",
+                "textColor4": "cbdcca",
+                "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
+                "width": 3000
+              },
+              "artworkOrigin": "podcast",
+              "assetUrl": "https://traffic.megaphone.fm/NSR1524700316.mp3?updated=1692386616",
+              "contentAdvisory": "",
+              "contentRating": "clean",
+              "copyright": "New Books Network",
+              "description": {
+                "short": "A Discussion with NIko Pfund of Oxford University Press",
+                "standard": "Niko Pfund joins the podcast to discuss the value of scientific content for building out Large Language Models and some of the challenges around tracking the quality and ownership of aggregated content from unknown sources. We also discuss potential avenues for collaboration between Generative AI companies and scholarly publishers.\n﻿Niko Pfund is Academic Publisher at Oxford University Press and President of Oxford’s US office.\nLearn more about your ad choices. Visit megaphone.fm/adchoices\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
+              },
+              "durationInMilliseconds": 2668000,
+              "episodeNumber": 132,
+              "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
+              "genreNames": [
+                "Books"
+              ],
+              "guid": "f51380c2-3df4-11ee-82e3-e7367b789c00",
+              "kind": "full",
+              "mediaKind": "audio",
+              "name": "Academic Publishers Grapple with Advances in AI",
+              "offers": [
+                {
+                  "kind": "get",
+                  "type": "STDQ"
+                }
+              ],
+              "releaseDateTime": "2023-08-19T08:00:00Z",
+              "subscribable": true,
+              "url": "https://podcasts.apple.com/us/podcast/academic-publishers-grapple-with-advances-in-ai/id1532604157?i=1000624956937"
+            },
+            "relationships": {
+              "channel": {
+                "href": "/v1/catalog/us/podcast-episodes/1000624956937/channel?l=en-US",
+                "data": []
+              },
+              "podcast": {
+                "href": "/v1/catalog/us/podcast-episodes/1000624956937/podcast?l=en-US",
+                "data": [
+                  {
+                    "id": "1532604157",
+                    "type": "podcasts",
+                    "href": "/v1/catalog/us/podcasts/1532604157?l=en-US",
+                    "attributes": {
+                      "artistName": "New Books Network",
+                      "artwork": {
+                        "bgColor": "446b4c",
+                        "hasP3": false,
+                        "height": 3000,
+                        "textColor1": "fdfbfc",
+                        "textColor2": "ecf9ea",
+                        "textColor3": "d8ded8",
+                        "textColor4": "cbdcca",
+                        "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
+                        "width": 3000
+                      },
+                      "completed": false,
+                      "contentRating": "clean",
+                      "copyright": "© New Books Network",
+                      "createdDate": "2020-09-19",
+                      "description": {
+                        "standard": "Interviews with digital humanists about their new work\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
+                      },
+                      "displayType": "free",
+                      "editorialArtwork": {},
+                      "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
+                      "genreNames": [
+                        "Books",
+                        "Podcasts",
+                        "Arts",
+                        "Science",
+                        "Social Sciences"
+                      ],
+                      "kind": "episodic",
+                      "languageTag": "en-US",
+                      "name": "New Work in Digital Humanities",
+                      "offers": [
+                        {
+                          "kind": "get",
+                          "type": "STDQ"
+                        }
+                      ],
+                      "releaseDateTime": "2025-09-09T08:00:00Z",
+                      "releaseFrequency": "Updated Biweekly",
+                      "seasonNumbers": [],
+                      "subscribable": true,
+                      "subscriptionUrl": "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/subscribePodcast?cc=us&id=1532604157",
+                      "trackCount": 186,
+                      "url": "https://podcasts.apple.com/us/podcast/new-work-in-digital-humanities/id1532604157",
+                      "websiteUrl": "https://newbooksnetwork.com"
+                    },
+                    "relationships": {
+                      "channel": {
+                        "href": "/v1/catalog/us/podcasts/1532604157/channel?l=en-US",
                         "data": []
                       }
                     }
@@ -6801,123 +6801,6 @@
             }
           },
           {
-            "id": "1000624956937",
-            "type": "podcast-episodes",
-            "href": "/v1/catalog/us/podcast-episodes/1000624956937?l=en-US",
-            "attributes": {
-              "artistName": "New Books Network",
-              "artwork": {
-                "bgColor": "446b4c",
-                "hasP3": false,
-                "height": 3000,
-                "textColor1": "fdfbfc",
-                "textColor2": "ecf9ea",
-                "textColor3": "d8ded8",
-                "textColor4": "cbdcca",
-                "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
-                "width": 3000
-              },
-              "artworkOrigin": "podcast",
-              "assetUrl": "https://traffic.megaphone.fm/NSR1524700316.mp3?updated=1692386616",
-              "contentAdvisory": "",
-              "contentRating": "clean",
-              "copyright": "New Books Network",
-              "description": {
-                "short": "A Discussion with NIko Pfund of Oxford University Press",
-                "standard": "Niko Pfund joins the podcast to discuss the value of scientific content for building out Large Language Models and some of the challenges around tracking the quality and ownership of aggregated content from unknown sources. We also discuss potential avenues for collaboration between Generative AI companies and scholarly publishers.\n﻿Niko Pfund is Academic Publisher at Oxford University Press and President of Oxford’s US office.\nLearn more about your ad choices. Visit megaphone.fm/adchoices\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
-              },
-              "durationInMilliseconds": 2668000,
-              "episodeNumber": 132,
-              "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
-              "genreNames": [
-                "Books"
-              ],
-              "guid": "f51380c2-3df4-11ee-82e3-e7367b789c00",
-              "kind": "full",
-              "mediaKind": "audio",
-              "name": "Academic Publishers Grapple with Advances in AI",
-              "offers": [
-                {
-                  "kind": "get",
-                  "type": "STDQ"
-                }
-              ],
-              "releaseDateTime": "2023-08-19T08:00:00Z",
-              "subscribable": true,
-              "url": "https://podcasts.apple.com/us/podcast/academic-publishers-grapple-with-advances-in-ai/id1532604157?i=1000624956937"
-            },
-            "relationships": {
-              "channel": {
-                "href": "/v1/catalog/us/podcast-episodes/1000624956937/channel?l=en-US",
-                "data": []
-              },
-              "podcast": {
-                "href": "/v1/catalog/us/podcast-episodes/1000624956937/podcast?l=en-US",
-                "data": [
-                  {
-                    "id": "1532604157",
-                    "type": "podcasts",
-                    "href": "/v1/catalog/us/podcasts/1532604157?l=en-US",
-                    "attributes": {
-                      "artistName": "New Books Network",
-                      "artwork": {
-                        "bgColor": "446b4c",
-                        "hasP3": false,
-                        "height": 3000,
-                        "textColor1": "fdfbfc",
-                        "textColor2": "ecf9ea",
-                        "textColor3": "d8ded8",
-                        "textColor4": "cbdcca",
-                        "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
-                        "width": 3000
-                      },
-                      "completed": false,
-                      "contentRating": "clean",
-                      "copyright": "© New Books Network",
-                      "createdDate": "2020-09-19",
-                      "description": {
-                        "standard": "Interviews with digital humanists about their new work\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
-                      },
-                      "displayType": "free",
-                      "editorialArtwork": {},
-                      "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
-                      "genreNames": [
-                        "Books",
-                        "Podcasts",
-                        "Arts",
-                        "Science",
-                        "Social Sciences"
-                      ],
-                      "kind": "episodic",
-                      "languageTag": "en-US",
-                      "name": "New Work in Digital Humanities",
-                      "offers": [
-                        {
-                          "kind": "get",
-                          "type": "STDQ"
-                        }
-                      ],
-                      "releaseDateTime": "2025-09-09T08:00:00Z",
-                      "releaseFrequency": "Updated Biweekly",
-                      "seasonNumbers": [],
-                      "subscribable": true,
-                      "subscriptionUrl": "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/subscribePodcast?cc=us&id=1532604157",
-                      "trackCount": 186,
-                      "url": "https://podcasts.apple.com/us/podcast/new-work-in-digital-humanities/id1532604157",
-                      "websiteUrl": "https://newbooksnetwork.com"
-                    },
-                    "relationships": {
-                      "channel": {
-                        "href": "/v1/catalog/us/podcasts/1532604157/channel?l=en-US",
-                        "data": []
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
             "id": "1000708797883",
             "type": "podcast-episodes",
             "href": "/v1/catalog/us/podcast-episodes/1000708797883?l=en-US",
@@ -7032,6 +6915,123 @@
                     "relationships": {
                       "channel": {
                         "href": "/v1/catalog/us/podcasts/1561011279/channel?l=en-US",
+                        "data": []
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "1000624956937",
+            "type": "podcast-episodes",
+            "href": "/v1/catalog/us/podcast-episodes/1000624956937?l=en-US",
+            "attributes": {
+              "artistName": "New Books Network",
+              "artwork": {
+                "bgColor": "446b4c",
+                "hasP3": false,
+                "height": 3000,
+                "textColor1": "fdfbfc",
+                "textColor2": "ecf9ea",
+                "textColor3": "d8ded8",
+                "textColor4": "cbdcca",
+                "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
+                "width": 3000
+              },
+              "artworkOrigin": "podcast",
+              "assetUrl": "https://traffic.megaphone.fm/NSR1524700316.mp3?updated=1692386616",
+              "contentAdvisory": "",
+              "contentRating": "clean",
+              "copyright": "New Books Network",
+              "description": {
+                "short": "A Discussion with NIko Pfund of Oxford University Press",
+                "standard": "Niko Pfund joins the podcast to discuss the value of scientific content for building out Large Language Models and some of the challenges around tracking the quality and ownership of aggregated content from unknown sources. We also discuss potential avenues for collaboration between Generative AI companies and scholarly publishers.\n﻿Niko Pfund is Academic Publisher at Oxford University Press and President of Oxford’s US office.\nLearn more about your ad choices. Visit megaphone.fm/adchoices\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
+              },
+              "durationInMilliseconds": 2668000,
+              "episodeNumber": 132,
+              "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
+              "genreNames": [
+                "Books"
+              ],
+              "guid": "f51380c2-3df4-11ee-82e3-e7367b789c00",
+              "kind": "full",
+              "mediaKind": "audio",
+              "name": "Academic Publishers Grapple with Advances in AI",
+              "offers": [
+                {
+                  "kind": "get",
+                  "type": "STDQ"
+                }
+              ],
+              "releaseDateTime": "2023-08-19T08:00:00Z",
+              "subscribable": true,
+              "url": "https://podcasts.apple.com/us/podcast/academic-publishers-grapple-with-advances-in-ai/id1532604157?i=1000624956937"
+            },
+            "relationships": {
+              "channel": {
+                "href": "/v1/catalog/us/podcast-episodes/1000624956937/channel?l=en-US",
+                "data": []
+              },
+              "podcast": {
+                "href": "/v1/catalog/us/podcast-episodes/1000624956937/podcast?l=en-US",
+                "data": [
+                  {
+                    "id": "1532604157",
+                    "type": "podcasts",
+                    "href": "/v1/catalog/us/podcasts/1532604157?l=en-US",
+                    "attributes": {
+                      "artistName": "New Books Network",
+                      "artwork": {
+                        "bgColor": "446b4c",
+                        "hasP3": false,
+                        "height": 3000,
+                        "textColor1": "fdfbfc",
+                        "textColor2": "ecf9ea",
+                        "textColor3": "d8ded8",
+                        "textColor4": "cbdcca",
+                        "url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts122/v4/8a/58/0b/8a580b88-4c61-d15a-f60e-9aaa8ce63630/mza_4425310994448104724.jpeg/{w}x{h}bb.{f}",
+                        "width": 3000
+                      },
+                      "completed": false,
+                      "contentRating": "clean",
+                      "copyright": "© New Books Network",
+                      "createdDate": "2020-09-19",
+                      "description": {
+                        "standard": "Interviews with digital humanists about their new work\nSupport our show by becoming a premium member! https://newbooksnetwork.supportingcast.fm/digital-humanities"
+                      },
+                      "displayType": "free",
+                      "editorialArtwork": {},
+                      "feedUrl": "https://feeds.megaphone.fm/digitalhumanties",
+                      "genreNames": [
+                        "Books",
+                        "Podcasts",
+                        "Arts",
+                        "Science",
+                        "Social Sciences"
+                      ],
+                      "kind": "episodic",
+                      "languageTag": "en-US",
+                      "name": "New Work in Digital Humanities",
+                      "offers": [
+                        {
+                          "kind": "get",
+                          "type": "STDQ"
+                        }
+                      ],
+                      "releaseDateTime": "2025-09-09T08:00:00Z",
+                      "releaseFrequency": "Updated Biweekly",
+                      "seasonNumbers": [],
+                      "subscribable": true,
+                      "subscriptionUrl": "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/subscribePodcast?cc=us&id=1532604157",
+                      "trackCount": 186,
+                      "url": "https://podcasts.apple.com/us/podcast/new-work-in-digital-humanities/id1532604157",
+                      "websiteUrl": "https://newbooksnetwork.com"
+                    },
+                    "relationships": {
+                      "channel": {
+                        "href": "/v1/catalog/us/podcasts/1532604157/channel?l=en-US",
                         "data": []
                       }
                     }
@@ -7979,7 +7979,7 @@
   },
   "meta": {
     "metrics": {
-      "dataSetId": "732d4a6f-d2b5-422f-add0-cdfe3b08e90b"
+      "dataSetId": "7b77f780-4532-4268-ac3c-769f897982c6"
     }
   }
 }

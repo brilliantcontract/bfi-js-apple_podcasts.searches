@@ -231,46 +231,57 @@ function parseProfiles(responseJson, query) {
     throw new Error(message || "Apple Podcasts API returned an error response.");
   }
 
-  const candidateItems = [];
+  const seen = new Set();
 
-  const addItems = (items) => {
-    if (Array.isArray(items)) {
-      candidateItems.push(...items.filter((item) => item && typeof item === "object"));
+  const extractProfile = (attributes) => {
+    if (!attributes || typeof attributes !== "object") {
+      return null;
     }
+
+    const url = typeof attributes.url === "string" ? attributes.url : "";
+
+    if (!url || seen.has(url)) {
+      return null;
+    }
+
+    const authorName =
+      typeof attributes.artistName === "string" ? attributes.artistName : "";
+    const profileTitle =
+      typeof attributes.name === "string" ? attributes.name : "";
+
+    seen.add(url);
+    return { authorName, profileTitle, query, url };
   };
 
-  addItems(responseJson?.included);
-  addItems(Array.isArray(responseJson?.data) ? responseJson.data : null);
+  const candidateProfiles = [];
 
-  if (!candidateItems.length) {
-    return [];
-  }
+  const collectAttributes = (value) => {
+    if (!value || typeof value !== "object") {
+      return;
+    }
 
-  const seenUrls = new Set();
+    if (Array.isArray(value)) {
+      value.forEach((item) => collectAttributes(item));
+      return;
+    }
 
-  return candidateItems
-    .map((item) => {
-      const attributes = item?.attributes;
-
-      if (!attributes || typeof attributes !== "object") {
-        return null;
+    if (value.attributes) {
+      const profile = extractProfile(value.attributes);
+      if (profile) {
+        candidateProfiles.push(profile);
       }
+    }
 
-      const authorName =
-        typeof attributes.artistName === "string" ? attributes.artistName : "";
-      const profileTitle =
-        typeof attributes.name === "string" ? attributes.name : "";
-      const url = typeof attributes.url === "string" ? attributes.url : "";
-
-      if (!url || seenUrls.has(url)) {
-        return null;
+    Object.values(value).forEach((child) => {
+      if (typeof child === "object") {
+        collectAttributes(child);
       }
+    });
+  };
 
-      seenUrls.add(url);
+  collectAttributes(responseJson);
 
-      return { authorName, profileTitle, query, url };
-    })
-    .filter((profile) => profile && profile.url);
+  return candidateProfiles;
 }
 
 async function fetchSearchResults(headers, query) {
