@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const HEADERS_FILE = path.join(DATA_DIR, "headers.json");
 
-const API_URL = "https://api-partner.spotify.com/pathfinder/v2/query";
+const API_URL = "https://amp-api.podcasts.apple.com/v1/catalog/us/search/groups";
 
 const SCRAPE_NINJA_ENDPOINT = "https://scrapeninja.p.rapidapi.com/scrape";
 const SCRAPE_NINJA_HOST = "scrapeninja.p.rapidapi.com";
@@ -30,9 +30,10 @@ const DB_CONFIG = {
   database: process.env.DB_NAME || "scrapers",
 };
 
-const FETCH_QUERIES_SQL = "select query from spotify.not_scraped_queries_vw";
+const FETCH_QUERIES_SQL =
+  "SELECT query FROM apple_podcasts.not_scraped_queries_vw";
 const INSERT_SEARCH_SQL =
-  "insert into spotify.searches(author_name, profile_title, query, url) values ($1, $2, $3, $4)";
+  "INSERT INTO apple_podcasts.searches(author_name, profile_title, query, url) VALUES ($1, $2, $3, $4)";
 
 function buildAuthorizationHeader(value) {
   if (!value || typeof value !== "string") {
@@ -46,15 +47,13 @@ function buildAuthorizationHeader(value) {
 }
 
 const DEFAULT_HEADERS = {
-  accept: "application/json",
-  "accept-language": "ru",
-  "app-platform": "WebPlayer",
-  authorization: buildAuthorizationHeader(process.env.SPOTIFY_AUTHORIZATION),
-  "client-token": process.env.SPOTIFY_CLIENT_TOKEN?.trim() || "",
-  "content-type": "application/json;charset=UTF-8",
-  origin: "https://open.spotify.com",
+  accept: "*/*",
+  "accept-language": "en-US,en;q=0.9,ru;q=0.8,uk;q=0.7",
+  authorization: buildAuthorizationHeader(process.env.APPLE_AUTHORIZATION),
+  cookie: "geo=UA",
+  origin: "https://podcasts.apple.com",
   priority: "u=1, i",
-  referer: "https://open.spotify.com/",
+  referer: "https://podcasts.apple.com/",
   "sec-ch-ua":
     '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
   "sec-ch-ua-mobile": "?0",
@@ -62,7 +61,6 @@ const DEFAULT_HEADERS = {
   "sec-fetch-dest": "empty",
   "sec-fetch-mode": "cors",
   "sec-fetch-site": "same-site",
-  "spotify-app-version": "1.2.78.120.g186ece09",
   "user-agent":
     process.env.USER_AGENT ||
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
@@ -102,121 +100,82 @@ function buildRequestHeaders(overrides) {
 }
 
 function validateAuthHeaders(headers) {
-  const missing = [];
-
   if (!headers.authorization) {
-    missing.push(
-      "authorization (Bearer token). Supply SPOTIFY_AUTHORIZATION env var or data/headers.json"
-    );
-  }
-
-  if (!headers["client-token"]) {
-    missing.push(
-      "client-token. Supply SPOTIFY_CLIENT_TOKEN env var or data/headers.json"
-    );
-  }
-
-  if (missing.length) {
     throw new Error(
-      `Missing required Spotify auth headers: ${missing.join("; ")}. Requests will fail with 401 until these are provided.`
+      "Missing required Apple Podcasts authorization header. Supply APPLE_AUTHORIZATION env var or data/headers.json"
     );
   }
 }
 
-function buildRequestBody(query) {
-  return {
-    variables: {
-      includePreReleases: false,
-      numberOfTopResults: 20,
-      searchTerm: query,
-      offset: 0,
-      limit: 30,
-      includeAudiobooks: true,
-      includeAuthors: false,
-    },
-    operationName: "searchPodcasts",
-    extensions: {
-      persistedQuery: {
-        version: 1,
-        sha256Hash: "f4d1e6ff2422dd998e26ba696e853e4372811843361e91105f736d128d3d64e0",
-      },
-    },
-  };
+function buildSearchUrl(query) {
+  const url = new URL(API_URL);
+  const params = url.searchParams;
+
+  params.set("platform", "web");
+  params.set("extend", "editorialArtwork,feedUrl");
+  params.append("extend[podcast-channels]", "availableShowCount");
+  params.append("extend[podcasts]", "editorialArtwork");
+  params.append("include[podcast-episodes]", "channel,podcast");
+  params.append("include[podcasts]", "channel");
+  params.set("limit", "25");
+  params.set("groups", "category,channel,episode,show,top");
+  params.set("with", "entitlements,transcripts");
+  params.set(
+    "types",
+    "podcasts,podcast-channels,podcast-episodes,categories,editorial-items"
+  );
+  params.set("term", query);
+  params.set("l", "en-US");
+
+  return url.toString();
 }
 
-function buildUrlFromUri(uri) {
-  if (typeof uri !== "string") {
-    return null;
-  }
-
-  const parts = uri.split(":");
-
-  if (parts.length < 3 || parts[0] !== "spotify") {
-    return null;
-  }
-
-  const type = parts[1];
-  const id = parts.slice(2).join(":");
-
-  if (!type || !id) {
-    return null;
-  }
-
-  return `https://open.spotify.com/${type}/${id}`;
-}
-
-function extractPodcastItems(responseJson) {
-  const searchPodcasts = responseJson?.data?.searchPodcasts;
-  const searchPodcastsV2 = responseJson?.data?.searchPodcastsV2;
-  const searchV2 = responseJson?.data?.searchV2;
-  const candidateArrays = [
-    searchPodcasts?.items,
-    searchPodcasts?.itemsV2,
-    searchPodcasts?.podcasts?.items,
-    searchPodcasts?.podcastUnionV2?.items,
-    searchPodcastsV2?.items,
-    searchPodcastsV2?.podcasts?.items,
-    searchPodcastsV2?.podcastUnionV2?.items,
-    searchV2?.podcasts?.items,
-  ];
-
-  return candidateArrays.find(Array.isArray) || [];
-}
- 
 function parseProfiles(responseJson, query) {
   if (Array.isArray(responseJson?.errors) && responseJson.errors.length) {
     const message = responseJson.errors
       .map((error) =>
-        typeof error?.message === "string" ? error.message.trim() : ""
+        typeof error?.detail === "string"
+          ? error.detail.trim()
+          : typeof error?.title === "string"
+            ? error.title.trim()
+            : typeof error?.message === "string"
+              ? error.message.trim()
+              : ""
       )
       .filter(Boolean)
       .join("; ");
 
-    throw new Error(message || "Spotify API returned an error response.");
+    throw new Error(message || "Apple Podcasts API returned an error response.");
   }
 
-  const items = extractPodcastItems(responseJson);
+  const candidates = [];
 
-  if (!Array.isArray(items) || !items.length) {
-    return [];
+  if (Array.isArray(responseJson?.data)) {
+    candidates.push(...responseJson.data);
   }
 
-  return items
+  if (Array.isArray(responseJson?.included)) {
+    candidates.push(...responseJson.included);
+  }
+
+  return candidates
+    .filter((item) => item && typeof item === "object")
     .map((item) => {
-      const data =
-        item && typeof item === "object" && item.data && typeof item.data === "object"
-          ? item.data
-          : item;
+      if (item.type && item.type !== "podcasts") {
+        return null;
+      }
 
-      if (!data || typeof data !== "object") {
+      const attributes = item.attributes;
+
+      if (!attributes || typeof attributes !== "object") {
         return null;
       }
 
       const authorName =
-        typeof data?.publisher?.name === "string" ? data.publisher.name : "";
-      const profileTitle = typeof data?.name === "string" ? data.name : "";
-      const uri = typeof data?.uri === "string" ? data.uri : "";
-      const url = buildUrlFromUri(uri);
+        typeof attributes.artistName === "string" ? attributes.artistName : "";
+      const profileTitle =
+        typeof attributes.name === "string" ? attributes.name : "";
+      const url = typeof attributes.url === "string" ? attributes.url : "";
 
       if (!url) {
         return null;
@@ -229,6 +188,7 @@ function parseProfiles(responseJson, query) {
 
 async function fetchSearchResults(headers, query) {
   if (USE_SCRAPE_NINJA) {
+    const targetUrl = buildSearchUrl(query);
     const scrapeResponse = await fetch(SCRAPE_NINJA_ENDPOINT, {
       method: "POST",
       headers: {
@@ -237,10 +197,9 @@ async function fetchSearchResults(headers, query) {
         "x-rapidapi-key": SCRAPE_NINJA_API_KEY,
       },
       body: JSON.stringify({
-        url: API_URL,
-        method: "POST",
+        url: targetUrl,
+        method: "GET",
         headers,
-        body: JSON.stringify(buildRequestBody(query)),
       }),
     });
 
@@ -261,10 +220,9 @@ async function fetchSearchResults(headers, query) {
     return parsedBody;
   }
 
-  const response = await fetch(API_URL, {
-    method: "POST",
+  const response = await fetch(buildSearchUrl(query), {
+    method: "GET",
     headers,
-    body: JSON.stringify(buildRequestBody(query)),
   });
 
   if (!response.ok) {
