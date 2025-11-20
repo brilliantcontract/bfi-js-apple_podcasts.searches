@@ -15,6 +15,11 @@ const HEADERS_FILE = path.join(DATA_DIR, "headers.json");
 const API_URL =
   "https://amp-api.podcasts.apple.com/v1/catalog/us/search/groups";
 
+const SCRAPE_NINJA_ENDPOINT = "https://scrapeninja.p.rapidapi.com/scrape";
+const SCRAPE_NINJA_HOST = "scrapeninja.p.rapidapi.com";
+const DEFAULT_SCRAPE_NINJA_API_KEY =
+  "455e2a6556msheffc310f7420b51p102ea0jsn1c531be1e299";
+
 const DB_CONFIG = {
   host: process.env.DB_HOST || "3.140.167.34",
   port: Number.parseInt(process.env.DB_PORT, 10) || 5432,
@@ -90,6 +95,65 @@ function buildRequestHeaders(overrides) {
   return Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [key, value]).filter(([, value]) => value !== "")
   );
+}
+
+function shouldUseScrapeNinja() {
+  return String(process.env.SCRAPE_NINJA_ENABLED || "").toLowerCase() === "true";
+}
+
+function getScrapeNinjaApiKey() {
+  return process.env.SCRAPE_NINJA_API_KEY || DEFAULT_SCRAPE_NINJA_API_KEY;
+}
+
+async function fetchViaScrapeNinja(url, headers) {
+  const apiKey = getScrapeNinjaApiKey();
+
+  if (!apiKey) {
+    throw new Error(
+      "SCRAPE_NINJA_API_KEY is required when SCRAPE_NINJA_ENABLED is true."
+    );
+  }
+
+  const response = await fetch(SCRAPE_NINJA_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-rapidapi-key": apiKey,
+      "x-rapidapi-host": SCRAPE_NINJA_HOST,
+    },
+    body: JSON.stringify({
+      url,
+      method: "GET",
+      headers,
+      autoparse: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(
+      `ScrapeNinja request failed with status ${response.status}: ${text.slice(0, 200)}`
+    );
+  }
+
+  const payload = await response.json();
+  let parsedBody = payload?.body;
+
+  if (typeof parsedBody === "string") {
+    try {
+      parsedBody = JSON.parse(parsedBody);
+    } catch (error) {
+      throw new Error(
+        `ScrapeNinja returned a non-JSON body: ${parsedBody.slice(0, 200)}`
+      );
+    }
+  }
+
+  if (!parsedBody) {
+    throw new Error("ScrapeNinja response did not include a body.");
+  }
+
+  return parsedBody;
 }
 
 function validateAuthHeaders(headers) {
@@ -182,10 +246,11 @@ function parseProfiles(responseJson, query) {
 
 async function fetchSearchResults(headers, query) {
   const url = buildSearchUrl(query);
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
+  if (shouldUseScrapeNinja()) {
+    return fetchViaScrapeNinja(url, headers);
+  }
+
+  const response = await fetch(url, { method: "GET", headers });
 
   if (!response.ok) {
     const text = await response.text();
