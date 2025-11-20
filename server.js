@@ -12,15 +12,8 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const HEADERS_FILE = path.join(DATA_DIR, "headers.json");
 
-const API_URL = "https://api-partner.spotify.com/pathfinder/v2/query";
-
-const SCRAPE_NINJA_ENDPOINT = "https://scrapeninja.p.rapidapi.com/scrape";
-const SCRAPE_NINJA_HOST = "scrapeninja.p.rapidapi.com";
-const DEFAULT_SCRAPE_NINJA_API_KEY =
-  "455e2a6556msheffc310f7420b51p102ea0jsn1c531be1e299";
-const SCRAPE_NINJA_API_KEY =
-  process.env.SCRAPE_NINJA_API_KEY || DEFAULT_SCRAPE_NINJA_API_KEY;
-const USE_SCRAPE_NINJA = process.env.USE_SCRAPE_NINJA === "true";
+const API_URL =
+  "https://amp-api.podcasts.apple.com/v1/catalog/us/search/groups";
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || "3.140.167.34",
@@ -30,9 +23,10 @@ const DB_CONFIG = {
   database: process.env.DB_NAME || "scrapers",
 };
 
-const FETCH_QUERIES_SQL = "select query from spotify.not_scraped_queries_vw";
+const FETCH_QUERIES_SQL =
+  "select query from apple_podcasts.not_scraped_queries_vw";
 const INSERT_SEARCH_SQL =
-  "insert into spotify.searches(author_name, profile_title, query, url) values ($1, $2, $3, $4)";
+  "insert into apple_podcasts.searches(author_name, profile_title, query, url) values ($1, $2, $3, $4)";
 
 function buildAuthorizationHeader(value) {
   if (!value || typeof value !== "string") {
@@ -46,15 +40,13 @@ function buildAuthorizationHeader(value) {
 }
 
 const DEFAULT_HEADERS = {
-  accept: "application/json",
-  "accept-language": "ru",
-  "app-platform": "WebPlayer",
-  authorization: buildAuthorizationHeader(process.env.SPOTIFY_AUTHORIZATION),
-  "client-token": process.env.SPOTIFY_CLIENT_TOKEN?.trim() || "",
-  "content-type": "application/json;charset=UTF-8",
-  origin: "https://open.spotify.com",
+  accept: "*/*",
+  "accept-language": "en-US,en;q=0.9,ru;q=0.8,uk;q=0.7",
+  authorization: buildAuthorizationHeader(process.env.APPLE_AUTHORIZATION),
+  cookie: "geo=UA",
+  origin: "https://podcasts.apple.com",
   priority: "u=1, i",
-  referer: "https://open.spotify.com/",
+  referer: "https://podcasts.apple.com/",
   "sec-ch-ua":
     '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
   "sec-ch-ua-mobile": "?0",
@@ -62,7 +54,6 @@ const DEFAULT_HEADERS = {
   "sec-fetch-dest": "empty",
   "sec-fetch-mode": "cors",
   "sec-fetch-site": "same-site",
-  "spotify-app-version": "1.2.78.120.g186ece09",
   "user-agent":
     process.env.USER_AGENT ||
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
@@ -102,87 +93,39 @@ function buildRequestHeaders(overrides) {
 }
 
 function validateAuthHeaders(headers) {
-  const missing = [];
-
   if (!headers.authorization) {
-    missing.push(
-      "authorization (Bearer token). Supply SPOTIFY_AUTHORIZATION env var or data/headers.json"
-    );
-  }
-
-  if (!headers["client-token"]) {
-    missing.push(
-      "client-token. Supply SPOTIFY_CLIENT_TOKEN env var or data/headers.json"
-    );
-  }
-
-  if (missing.length) {
     throw new Error(
-      `Missing required Spotify auth headers: ${missing.join("; ")}. Requests will fail with 401 until these are provided.`
+      "authorization (Bearer token) is required. Supply APPLE_AUTHORIZATION env var or data/headers.json"
     );
   }
 }
 
-function buildRequestBody(query) {
-  return {
-    variables: {
-      includePreReleases: false,
-      numberOfTopResults: 20,
-      searchTerm: query,
-      offset: 0,
-      limit: 30,
-      includeAudiobooks: true,
-      includeAuthors: false,
-    },
-    operationName: "searchPodcasts",
-    extensions: {
-      persistedQuery: {
-        version: 1,
-        sha256Hash: "f4d1e6ff2422dd998e26ba696e853e4372811843361e91105f736d128d3d64e0",
-      },
-    },
+function buildSearchUrl(query) {
+  const url = new URL(API_URL);
+  const params = {
+    platform: "web",
+    "extend": "editorialArtwork,feedUrl",
+    "extend[podcast-channels]": "availableShowCount",
+    "extend[podcasts]": "editorialArtwork",
+    "include[podcast-episodes]": "channel,podcast",
+    "include[podcasts]": "channel",
+    limit: "25",
+    groups: "category,channel,episode,show,top",
+    with: "entitlements,transcripts",
+    types: "podcasts,podcast-channels,podcast-episodes,categories,editorial-items",
+    term: query,
+    l: "en-US",
   };
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === "string") {
+      url.searchParams.set(key, value);
+    }
+  });
+
+  return url.toString();
 }
 
-function buildUrlFromUri(uri) {
-  if (typeof uri !== "string") {
-    return null;
-  }
-
-  const parts = uri.split(":");
-
-  if (parts.length < 3 || parts[0] !== "spotify") {
-    return null;
-  }
-
-  const type = parts[1];
-  const id = parts.slice(2).join(":");
-
-  if (!type || !id) {
-    return null;
-  }
-
-  return `https://open.spotify.com/${type}/${id}`;
-}
-
-function extractPodcastItems(responseJson) {
-  const searchPodcasts = responseJson?.data?.searchPodcasts;
-  const searchPodcastsV2 = responseJson?.data?.searchPodcastsV2;
-  const searchV2 = responseJson?.data?.searchV2;
-  const candidateArrays = [
-    searchPodcasts?.items,
-    searchPodcasts?.itemsV2,
-    searchPodcasts?.podcasts?.items,
-    searchPodcasts?.podcastUnionV2?.items,
-    searchPodcastsV2?.items,
-    searchPodcastsV2?.podcasts?.items,
-    searchPodcastsV2?.podcastUnionV2?.items,
-    searchV2?.podcasts?.items,
-  ];
-
-  return candidateArrays.find(Array.isArray) || [];
-}
- 
 function parseProfiles(responseJson, query) {
   if (Array.isArray(responseJson?.errors) && responseJson.errors.length) {
     const message = responseJson.errors
@@ -192,79 +135,56 @@ function parseProfiles(responseJson, query) {
       .filter(Boolean)
       .join("; ");
 
-    throw new Error(message || "Spotify API returned an error response.");
+    throw new Error(message || "Apple Podcasts API returned an error response.");
   }
 
-  const items = extractPodcastItems(responseJson);
+  const candidateItems = [];
 
-  if (!Array.isArray(items) || !items.length) {
+  const addItems = (items) => {
+    if (Array.isArray(items)) {
+      candidateItems.push(...items.filter((item) => item && typeof item === "object"));
+    }
+  };
+
+  addItems(responseJson?.included);
+  addItems(Array.isArray(responseJson?.data) ? responseJson.data : null);
+
+  if (!candidateItems.length) {
     return [];
   }
 
-  return items
-    .map((item) => {
-      const data =
-        item && typeof item === "object" && item.data && typeof item.data === "object"
-          ? item.data
-          : item;
+  const seenUrls = new Set();
 
-      if (!data || typeof data !== "object") {
+  return candidateItems
+    .map((item) => {
+      const attributes = item?.attributes;
+
+      if (!attributes || typeof attributes !== "object") {
         return null;
       }
 
       const authorName =
-        typeof data?.publisher?.name === "string" ? data.publisher.name : "";
-      const profileTitle = typeof data?.name === "string" ? data.name : "";
-      const uri = typeof data?.uri === "string" ? data.uri : "";
-      const url = buildUrlFromUri(uri);
+        typeof attributes.artistName === "string" ? attributes.artistName : "";
+      const profileTitle =
+        typeof attributes.name === "string" ? attributes.name : "";
+      const url = typeof attributes.url === "string" ? attributes.url : "";
 
-      if (!url) {
+      if (!url || seenUrls.has(url)) {
         return null;
       }
 
+      seenUrls.add(url);
+
       return { authorName, profileTitle, query, url };
     })
-    .filter(Boolean);
+    .filter((profile) => profile && profile.url);
 }
 
 async function fetchSearchResults(headers, query) {
-  if (USE_SCRAPE_NINJA) {
-    const scrapeResponse = await fetch(SCRAPE_NINJA_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-rapidapi-host": SCRAPE_NINJA_HOST,
-        "x-rapidapi-key": SCRAPE_NINJA_API_KEY,
-      },
-      body: JSON.stringify({
-        url: API_URL,
-        method: "POST",
-        headers,
-        body: JSON.stringify(buildRequestBody(query)),
-      }),
-    });
-
-    if (!scrapeResponse.ok) {
-      const text = await scrapeResponse.text();
-      throw new Error(
-        `Scrape Ninja request failed with status ${scrapeResponse.status}: ${text.slice(0, 200)}`
-      );
-    }
-
-    const result = await scrapeResponse.json();
-    const parsedBody = result?.body ? JSON.parse(result.body) : null;
-
-    if (!parsedBody) {
-      throw new Error("Scrape Ninja response did not include a parsable body.");
-    }
-
-    return parsedBody;
-  }
-
-  const response = await fetch(API_URL, {
-    method: "POST",
+  const url = buildSearchUrl(query);
+  const response = await fetch(url, {
+    method: "GET",
     headers,
-    body: JSON.stringify(buildRequestBody(query)),
   });
 
   if (!response.ok) {
