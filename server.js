@@ -11,7 +11,6 @@ const __dirname = path.dirname(__filename);
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const HEADERS_FILE = path.join(DATA_DIR, "headers.json");
-const PAGE_DIR = path.join(DATA_DIR, "page");
 
 const API_URL =
   "https://amp-api.podcasts.apple.com/v1/catalog/us/search/groups";
@@ -67,10 +66,6 @@ const DEFAULT_HEADERS = {
 
 async function ensureDataDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function ensurePageDir() {
-  await fs.mkdir(PAGE_DIR, { recursive: true });
 }
 
 async function loadHeaderOverrides() {
@@ -167,30 +162,6 @@ function validateAuthHeaders(headers) {
       "authorization (Bearer token) is required. Supply APPLE_AUTHORIZATION env var or data/headers.json"
     );
   }
-}
-
-function buildSafeFilename(query) {
-  const safeQuery = (query || "")
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 50);
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  return `${safeQuery || "query"}-${timestamp}.json`;
-}
-
-async function saveResponseJson(query, responseJson) {
-  await ensurePageDir();
-
-  const filename = buildSafeFilename(query);
-  const filePath = path.join(PAGE_DIR, filename);
-
-  await fs.writeFile(filePath, JSON.stringify(responseJson, null, 2), "utf-8");
-  return filePath;
 }
 
 function buildSearchUrl(query) {
@@ -341,7 +312,6 @@ async function saveProfiles(pool, profiles) {
 
 async function main() {
   await ensureDataDir();
-  await ensurePageDir();
 
   const headerOverrides = await loadHeaderOverrides();
   const headers = buildRequestHeaders(headerOverrides);
@@ -363,7 +333,6 @@ async function main() {
     for (const query of queries) {
       try {
         const responseJson = await fetchSearchResults(headers, query);
-        await saveResponseJson(query, responseJson);
         const profiles = parseProfiles(responseJson, query);
         
         if (!profiles.length) {
