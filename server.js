@@ -14,6 +14,11 @@ const HEADERS_FILE = path.join(DATA_DIR, "headers.json");
 
 const API_URL =
   "https://amp-api.podcasts.apple.com/v1/catalog/us/search/groups";
+const SEARCH_PAGE_LIMIT = 50;
+const SEARCH_MAX_OFFSET = 950;
+const SEARCH_OFFSET_STEP = 50;
+const SEARCH_REQUEST_COUNT =
+  Math.floor(SEARCH_MAX_OFFSET / SEARCH_OFFSET_STEP) + 1;
 
 const SCRAPE_NINJA_ENDPOINT = "https://scrapeninja.p.rapidapi.com/scrape";
 const SCRAPE_NINJA_HOST = "scrapeninja.p.rapidapi.com";
@@ -164,7 +169,7 @@ function validateAuthHeaders(headers) {
   }
 }
 
-function buildSearchUrl(query) {
+function buildSearchUrl(query, offset = 0) {
   const url = new URL(API_URL);
   const params = {
     platform: "web",
@@ -173,13 +178,17 @@ function buildSearchUrl(query) {
     "extend[podcasts]": "editorialArtwork",
     "include[podcast-episodes]": "channel,podcast",
     "include[podcasts]": "channel",
-    limit: "25",
+    limit: String(SEARCH_PAGE_LIMIT),
     groups: "category,channel,episode,show,top",
     with: "entitlements,transcripts",
     types: "podcasts,podcast-channels,podcast-episodes,categories,editorial-items",
     term: query,
     l: "en-US",
   };
+
+  if (offset > 0) {
+    params.offset = String(offset);
+  }
 
   Object.entries(params).forEach(([key, value]) => {
     if (typeof value === "string") {
@@ -191,8 +200,14 @@ function buildSearchUrl(query) {
 }
 
 function parseProfiles(responseJson, query) {
-  if (Array.isArray(responseJson?.errors) && responseJson.errors.length) {
-    const message = responseJson.errors
+  const responses = Array.isArray(responseJson) ? responseJson : [responseJson];
+
+  const errors = responses.flatMap((responseItem) =>
+    Array.isArray(responseItem?.errors) ? responseItem.errors : []
+  );
+
+  if (errors.length) {
+    const message = errors
       .map((error) =>
         typeof error?.message === "string" ? error.message.trim() : ""
       )
@@ -256,21 +271,37 @@ function parseProfiles(responseJson, query) {
 }
 
 async function fetchSearchResults(headers, query) {
-  const url = buildSearchUrl(query);
-  if (shouldUseScrapeNinja()) {
-    return fetchViaScrapeNinja(url, headers);
+  const responses = [];
+
+  for (
+    let requestIndex = 0, offset = 0;
+    requestIndex < SEARCH_REQUEST_COUNT && offset <= SEARCH_MAX_OFFSET;
+    requestIndex += 1, offset += SEARCH_OFFSET_STEP
+  ) {
+    const url = buildSearchUrl(query, offset);
+    const responseJson = shouldUseScrapeNinja()
+      ? await fetchViaScrapeNinja(url, headers)
+      : await (async () => {
+          const response = await fetch(url, { method: "GET", headers });
+
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(
+              `Request failed with status ${response.status}: ${text.slice(0, 200)}`
+            );
+          }
+
+          return response.json();
+        })();
+
+    if (Array.isArray(responseJson?.data) && responseJson.data.length === 0) {
+      break;
+    }
+
+    responses.push(responseJson);
   }
 
-  const response = await fetch(url, { method: "GET", headers });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(
-      `Request failed with status ${response.status}: ${text.slice(0, 200)}`
-    );
-  }
-
-  return response.json();
+  return responses;
 }
 
 async function loadQueries(pool) {
